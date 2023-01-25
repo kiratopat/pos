@@ -18,6 +18,7 @@ CREATE TABLE Employee (
     fname VARCHAR(255) NOT NULL,
     lname VARCHAR(255) NOT NULL,
     tel VARCHAR(10) NOT NULL,
+    password VARCHAR(500) NOT NULL,
     role VARCHAR(255) NOT NULL
 );
 CREATE TABLE Customer (
