@@ -1,29 +1,26 @@
 <?php
+require "../db/condb.php";
 
-require "../database/condb.php";
+// echo $_POST['employee_id'];
 
-
-$user = $_POST['employee_id'];
-$pass = $_POST['password'];
-$sql = "SELECT * FROM employee WHERE employee_id = '" . $user . "' AND password = '" . $pass . "'";
-$result = mysqli_query($condb, $sql);
-$array_result = mysqli_fetch_array($result);
-
-if (empty($array_result)) {
-    // echo "insert OK !!!";
-    setcookie("login-result", 0);
-    echo "<script>
-    location.href = './login.php';
-    </script>";
-} else {
-    // setcookie("login-result", 1);
-    setcookie("login-result", "", time() - 3600);
-    $_SESSION["id"] = $array_result['id'];
-    $_SESSION["user"] = $array_result['user'];
-    $_SESSION["firstname"] = $array_result['firstname'];
-    $_SESSION["surname"] = $array_result['surname'];
-    $_SESSION["role"] = $array_result['role'];
-
-    echo "<script>location.href = './search.php';</script>";
-    // echo "insert ERROR !!!";
+if (isset($_POST['employee_id']) && isset($_POST['password'])) {
+    $employee_id = mysqli_real_escape_string($condb, $_POST['employee_id']);
+    $pass = mysqli_real_escape_string($condb, $_POST['password']);
+    $sql = "SELECT * FROM employee WHERE employee_id = '$employee_id' AND password = '$pass'";
+    $result = mysqli_query($condb, $sql);
+    $array_result = mysqli_fetch_array($result, MYSQLI_ASSOC);
+    if (empty($array_result)) {
+        // header("Location: ./login.php");
+        echo "NotAllow";
+    } else {
+        session_start();
+        $_SESSION["id"] = $array_result['id'];
+        $_SESSION["employee_id"] = $array_result['employee_id'];
+        $_SESSION["fname"] = $array_result['fname'];
+        $_SESSION["lname"] = $array_result['lname'];
+        $_SESSION["role"] = $array_result['role'];
+        echo "pass";
+        // echo $_SESSION["id"] . $_SESSION["employee_id"] . $_SESSION["fname"] . $_SESSION["lname"] . $_SESSION["role"];
+        // header("Location: ../dashboard.php");
+    }
 }

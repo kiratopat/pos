@@ -1,21 +1,25 @@
  <!-- Main Sidebar Container -->
  <aside class="main-sidebar sidebar-dark-primary elevation-4">
      <!-- Brand Logo -->
-     <a href="index3.html" class="brand-link">
+     <a href="./dashboard.php" class="brand-link">
          <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-         <span class="brand-text font-weight-light">AdminLTE 3</span>
+         <span class="brand-text font-weight-light"><b>POS</b> kirato</span>
      </a>
 
      <!-- Sidebar -->
      <div class="sidebar">
          <!-- Sidebar user panel (optional) -->
-         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+         <div class="user-panel mt-3 pb-3 mb-3 d-flex justify-content-between">
              <div class="image">
                  <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
              </div>
              <div class="info">
                  <a href="#" class="d-block"><?= $_SESSION["fname"] . " " . $_SESSION["lname"] ?></a>
              </div>
+             <button class="btn btn-danger text-center align-middle mr-2" id="logout">
+                 <i class="fas fa-sign-out-alt"></i> logout
+             </button>
+
          </div>
 
          <!-- SidebarSearch Form -->
@@ -46,7 +50,7 @@
                      </a>
                  </li>
                  <li class="nav-item">
-                     <a href="./dashboard.php" class="nav-link <?= basename($_SERVER['REQUEST_URI']) == "cashier.php" ? "active" : "" ?>">
+                     <a href="./cashier.php" class="nav-link <?= basename($_SERVER['REQUEST_URI']) == "cashier.php" ? "active" : "" ?>">
                          <i class="nav-icon fas fa-money-bill-wave"></i>
                          <p>
                              Cashier
@@ -64,7 +68,7 @@
                      </a>
                  </li>
                  <li class="nav-item">
-                     <a href="./dashboard.php" class="nav-link <?= basename($_SERVER['REQUEST_URI']) == "stock.php" ? "active" : "" ?>">
+                     <a href="./stock.php" class="nav-link <?= basename($_SERVER['REQUEST_URI']) == "stock.php" ? "active" : "" ?>">
                          <i class="nav-icon fas fa-warehouse"></i>
                          <p>
                              Stock
@@ -88,3 +92,15 @@
      </div>
      <!-- /.sidebar -->
  </aside>
+
+ <script>
+     $("#logout").click(function() {
+         $.ajax({
+             url: "auth/logout.php",
+             type: "POST",
+             success: function(data) {
+                 window.location.href = "./login.php";
+             }
+         });
+     });
+ </script>

@@ -66,12 +66,12 @@
                 let employee_id = $("#employee_id").val();
                 let password = $("#password").val();
                 // alert();
-                $.post("./auth/loginOTM.php", {
+                $.post("./auth/login.php", {
                         employee_id: employee_id,
                         password: password
                     },
                     function(data, status) {
-                        alert("Data: " + data + "\nStatus: " + status);
+                        // alert("Data: " + data + "\nStatus: " + status);
                         if (data == "pass") {
                             window.location.href = "./dashboard.php";
                         } else {
