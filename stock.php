@@ -238,6 +238,11 @@
                             <!-- /.modal-dialog -->
                         </div>
                         <!-- /.modal Remove-->
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
         </section>
         <!-- /.content -->
     </div>
