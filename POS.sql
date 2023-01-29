@@ -17,6 +17,7 @@ CREATE TABLE Product (
     file_id INT,
     FOREIGN KEY (file_id) REFERENCES File(file_id)
 );
+ALTER TABLE Product AUTO_INCREMENT=10001;
 CREATE TABLE ProductType (
     product_type_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL
@@ -35,7 +36,7 @@ CREATE TABLE Customer (
     customer_id INT PRIMARY KEY AUTO_INCREMENT,
     fname VARCHAR(255) NOT NULL,
     lname VARCHAR(255) NOT NULL,
-    tel VARCHAR(10) NOT NULL,
+    tel VARCHAR(10) NOT NULL UNIQUE,
     birth DATE NOT NULL,
     gender VARCHAR(255) NOT NULL,
     point INT NOT NULL
@@ -91,11 +92,11 @@ VALUES ('John', 'Doe', '1234567890', 'test', 'Manager'),
        ('Sara', 'Johnson', '6677889900', 'test', 'Manager'),
        ('Mike', 'Williams', '3344112233', 'test', 'Sales');
 INSERT INTO Customer (fname, lname, tel, birth, gender, point)
-VALUES ('Jane', 'Smith', '1234567890', '1990-01-01', 'Female', 100),
+VALUES ('Jane', 'Smith', '0992324617', '1990-01-01', 'Female', 100),
        ('John', 'Doe', '0987654321', '1980-01-01', 'Male', 50),
-       ('Bob', 'Johnson', '1122334455', '1970-01-01', 'Male', 25),
-       ('Sara', 'Williams', '6677889900', '1960-01-01', 'Female', 10),
-       ('Mike', 'Jones', '3344112233', '1950-01-01', 'Male', 5);
+       ('Bob', 'Johnson', '0812345678', '1970-01-01', 'Male', 25),
+       ('Sara', 'Williams', '0878203846', '1960-01-01', 'Female', 10),
+       ('Mike', 'Jones', '0999999999', '1950-01-01', 'Male', 5);
 INSERT INTO Receipt (customer_id, employee_id, discount, timestamp)
 VALUES (1, 1, 0.00, NOW()),
        (2, 2, 5.00, NOW()),
@@ -103,11 +104,11 @@ VALUES (1, 1, 0.00, NOW()),
        (4, 4, 15.00, NOW()),
        (5, 5, 20.00, NOW());
 INSERT INTO ProductReceipt (receipt_id, product_id, quantity, amount)
-VALUES (1, 1, 1, 10.99),
-       (1, 2, 2, 31.98),
-       (2, 3, 3, 62.97),
-       (3, 4, 4, 103.96),
-       (4, 5, 5, 164.95);
+VALUES (1, 10001, 1, 10.99),
+       (1, 10002, 2, 31.98),
+       (2, 10003, 3, 62.97),
+       (3, 10004, 4, 103.96),
+       (4, 10005, 5, 164.95);
 INSERT INTO Coupon (name, value, stock)
 VALUES
     ("SummerSale", 10.00, 100),
