@@ -9,19 +9,22 @@ CREATE TABLE File (
     path VARCHAR(255) NOT NULL,
     type VARCHAR(255) NOT NULL
 );
+CREATE TABLE ProductType (
+    product_type_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL
+);
 CREATE TABLE Product (
     product_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
     stock INT NOT NULL,
     file_id INT,
-    FOREIGN KEY (file_id) REFERENCES File(file_id)
+    product_type_id INT,
+    FOREIGN KEY (file_id) REFERENCES File(file_id),
+    FOREIGN KEY (product_type_id) REFERENCES ProductType(product_type_id)
 );
 ALTER TABLE Product AUTO_INCREMENT=10001;
-CREATE TABLE ProductType (
-    product_type_id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL
-);
+
 CREATE TABLE Employee (
     employee_id INT PRIMARY KEY AUTO_INCREMENT,
     fname VARCHAR(255) NOT NULL,
@@ -73,18 +76,18 @@ VALUES ('camera.jpg','image/jpg'),
        ('bag.jpg','image/jpg'),
        ('film.jpg','image/jpg'),
        ('jbl.jpg','image/jpg');
-INSERT INTO Product (name, price, stock, file_id)
-VALUES ('Camera', 10.99, 100,1),
-       ('Nike', 15.99, 50,2),
-       ('Bag', 20.99, 25,3),
-       ('Film', 25.99, 10,4),
-       ('JBL', 30.99, 5,5);
 INSERT INTO ProductType (name)
 VALUES ('Type 1'),
        ('Type 2'),
        ('Type 3'),
        ('Type 4'),
        ('Type 5');
+INSERT INTO Product (name, price, stock, file_id, product_type_id)
+VALUES ('Camera', 10.99, 100,1,1),
+       ('Nike', 15.99, 50,2,2),
+       ('Bag', 20.99, 25,3,3),
+       ('Film', 25.99, 10,4,4),
+       ('JBL', 30.99, 5,5,5);
 INSERT INTO Employee (fname, lname, tel,password, role)
 VALUES ('John', 'Doe', '1234567890', 'test', 'Manager'),
        ('Jane', 'Doe', '0987654321', 'test', 'Sales'),
