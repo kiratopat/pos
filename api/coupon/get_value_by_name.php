@@ -2,12 +2,16 @@
 include "../../db/condb.php";
 if (isset($_POST['coupon_name'])) {
     $name = $_POST['coupon_name'];
-    $sql = "SELECT value FROM `coupon` WHERE coupon.name = '$name';";
+    $sql = "SELECT value,stock FROM `coupon` WHERE coupon.name = '$name';";
     $result = mysqli_query($condb, $sql);
     // if have result sent json of that product else sent 404
     if (mysqli_num_rows($result) > 0) {
         $row = mysqli_fetch_assoc($result);
-        echo json_encode($row);
+        if ($row['stock'] > 0) {
+            echo json_encode($row);
+        } else {
+            echo NULL;
+        }
     } else {
         // echo mysqli error
         echo mysqli_error($condb);

@@ -44,11 +44,18 @@ CREATE TABLE Customer (
     gender VARCHAR(255) NOT NULL,
     point INT NOT NULL
 );
+CREATE TABLE Coupon (
+    coupon_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    value DECIMAL(10,2) NOT NULL,
+    stock INT NOT NULL
+);
 CREATE TABLE Receipt (
     receipt_id INT PRIMARY KEY AUTO_INCREMENT,
-    customer_id INT NOT NULL,
+    customer_id INT NOT NULL DEFAULT 1,
     employee_id INT NOT NULL,
-    discount DECIMAL(10, 2) NOT NULL,
+    coupon VARCHAR(255),
+    total DECIMAL(10, 2) NOT NULL,
     timestamp TIMESTAMP NOT NULL,
     FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
     FOREIGN KEY (employee_id) REFERENCES Employee(employee_id)
@@ -61,12 +68,6 @@ CREATE TABLE ProductReceipt (
     amount DECIMAL(10, 2) NOT NULL,
     FOREIGN KEY (receipt_id) REFERENCES Receipt(receipt_id),
     FOREIGN KEY (product_id) REFERENCES Product(product_id)
-);
-CREATE TABLE Coupon (
-    coupon_id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    value DECIMAL(10,2) NOT NULL,
-    stock INT NOT NULL
 );
 
 -- insert seed
@@ -94,13 +95,16 @@ VALUES ('John', 'Doe', '1234567890', 'test', 'Manager'),
        ('Bob', 'Smith', '1122334455', 'test', 'Cashier'),
        ('Sara', 'Johnson', '6677889900', 'test', 'Manager'),
        ('Mike', 'Williams', '3344112233', 'test', 'Sales');
+VALUES ('John', 'Doe', '1234567890', 'test', 'Manager');
 INSERT INTO Customer (fname, lname, tel, birth, gender, point)
-VALUES ('Jane', 'Smith', '0992324617', '1990-01-01', 'Female', 100),
+VALUES ('none', 'none', '0', '1990-01-01', '', 0),
+       ('Jane', 'Smith', '0992324617', '1990-01-01', 'Female', 100),
        ('John', 'Doe', '0987654321', '1980-01-01', 'Male', 50),
        ('Bob', 'Johnson', '0812345678', '1970-01-01', 'Male', 25),
        ('Sara', 'Williams', '0878203846', '1960-01-01', 'Female', 10),
        ('Mike', 'Jones', '0999999999', '1950-01-01', 'Male', 5);
-INSERT INTO Receipt (customer_id, employee_id, discount, timestamp)
+
+INSERT INTO Receipt (customer_id, employee_id, total, timestamp)
 VALUES (1, 1, 0.00, NOW()),
        (2, 2, 5.00, NOW()),
        (3, 3, 10.00, NOW()),

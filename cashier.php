@@ -89,19 +89,19 @@
                 <!-- /.col -->
 
                 <div class="col-md-4">
-                    <div class="card card-default">
-                        <div class="card-body" style="padding-bottom: 0;">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-info"><i class="fas fa-dollar-sign"></i></span>
 
-                                <div class="info-box-content">
-                                    <h5 class="info-box-text">Total</h5>
-                                    <h2 class="info-box-number"><span id="total">0</span> THB</h2>
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
+
+                    <div class="card-body info-box">
+                        <span class="info-box-icon bg-info"><i class="fas fa-dollar-sign"></i></span>
+
+                        <div class="info-box-content">
+                            <h5 class="info-box-text">Total</h5>
+                            <h2 class="info-box-number"><span id="total">0</span> THB</h2>
                         </div>
+                        <!-- /.info-box-content -->
                     </div>
+
+
                     <!-- /.card up -->
                     <div class="card card-default">
                         <div class="card-header">
@@ -151,7 +151,7 @@
                         <!-- /.card-header -->
                         <div class="card-body">
                             <div class="d-flex  justify-content-between">
-                                <button class="btn-outline-success">
+                                <button class="btn-outline-success" id="cash_paid">
                                     <i class="fas fa-money-bill-wave"></i>
                                     Cash
                                 </button>
@@ -213,6 +213,10 @@
 
 <script>
     let total = new Decimal(0.00);
+    let coupon_value_state = 0;
+    let coupon_name_state = "";
+    let total_state = 0;
+    let member_tel_state = "";
     $(document).ready(function() {
         // create function useEffect like a react
 
@@ -227,22 +231,58 @@
             }
         }
 
+        async function postReceipt(e) {
+            e.preventDefault();
+            let total = total_state;
+            let coupon = coupon_name_state;
+            let member_tel = $('#member_tel').val();
+            // get all data in <tr> product list on dom then push to product_list_state array
+            let product_list = [];
+            let product_list_dom = await $('.product_list');
+            product_list_dom.each(function(e) {
+                let product = {
+                    id: $(this).find('.product_id').text(),
+                    name: $(this).find('.product_name').text(),
+                    price: $(this).find('.product_price').text(),
+                    quantity: $(this).find('.product_quantity').val(),
+                    amount: $(this).find('.amount').text(),
+                }
+                product_list.push(product);
+            })
+            let data = {
+                total: total,
+                coupon: coupon,
+                member_tel: member_tel,
+                product_list: product_list
+            }
+            console.log(data)
+            $.ajax({
+                url: "./api/receipt.php",
+                type: "POST",
+                data: data,
+                success: function(data) {
+                    console.log(data)
+                    if (data == 200) {
+                        alert("Success");
+                        window.location.reload();
+                    } else {
+                        alert("Error");
+                    }
+                }
+            })
+        }
+
         $('#transfer').on('click', async (e) => {
             e.preventDefault();
             render_qr();
         })
-
         $('.coupon_value_paragraph').hide();
-
         let numberFormat = new Intl.NumberFormat('th-TH', {
             minimumFractionDigits: 2
         });
-
         // set span id="total"
         $('#total').text(total.toFixed(2));
-
         // if (total < 0) total = 0;
-
         // console.warn(total)
         // $('#total').text(total.toFixed(2));
         async function updateTotal() {
@@ -263,6 +303,7 @@
             total = total.minus(coupon_value);
             // if total < 0 then total = 0
             if (total < 0) total = 0;
+            total_state = parseFloat(total);
             $('#total').text(numberFormat.format(total));
 
         }
@@ -295,17 +336,6 @@
                     success: async function(data) {
                         data = JSON.parse(data);
                         console.log(data);
-                        // // price = parseFloat(data.price);
-                        // let old_total = new Decimal(total)
-                        // // let new_total = new Decimal(0.2)
-                        // // let price = a.add(b);
-                        // let price = new Decimal(parseFloat(data.price))
-                        // console.log(price.toString());
-                        // total = old_total.add(price)
-                        // updateTotal()
-                        // create new tr element from data that have response {product_id: '10001', name: 'Camera', price: '10.99', stock: '100', file_id: '1'}
-
-                        // check if product_id is already in tbody add quantity that tr one else append new tr
                         let tr = $(`tr[key="${data.product_id}"]`);
                         if (tr.length > 0) {
                             let quantity = parseInt(tr.find('#quantity').val());
@@ -319,14 +349,11 @@
                             updateTotal()
 
                         } else {
-                            let tr = `<tr key="${data.product_id}"><td>${data.product_id}</td><td>${data.name}</td><td>${numberFormat.format(data.price)}</td><td class="d-flex justify-content-center"><input type="number" min="0" value="1" class="form-control text-center" style="width: 30%;" id="quantity" placeholder="Qua."><button type="button" class="btn btn-danger ml-2 delete-button"><i class="fas fa-trash"></i></button></td><td><h5><b class="amount">${numberFormat.format(data.price)}</b></h5></td></tr>`;
+                            let tr = `<tr class="product_list" key="${data.product_id}"><td class="product_id">${data.product_id}</td><td class="product_name">${data.name}</td><td class="product_price">${numberFormat.format(data.price)}</td><td class="d-flex justify-content-center"><input type="number" min="0" value="1" class="form-control text-center product_quantity" style="width: 30%;" id="quantity" placeholder="Qua."><button type="button" class="btn btn-danger ml-2 delete-button"><i class="fas fa-trash"></i></button></td><td><h5><b class="amount">${numberFormat.format(data.price)}</b></h5></td></tr>`;
                             // append to tbody
                             $('tbody').append(tr);
                             updateTotal()
                         }
-                        // let tr = `<tr key="${data.product_id}"><td>${data.product_id}</td><td>${data.name}</td><td>$${data.price}</td><td class="d-flex justify-content-center"><input type="number" min="0" value="1" class="form-control text-center" style="width: 30%;" id="quantity" placeholder="Qua."><button type="button" class="btn btn-danger ml-2 delete-button"><i class="fas fa-trash"></i></button></td><td><h5><b>$${data.price}</b></h5></td></tr>`;
-                        // // append to tbody
-                        // $('tbody').append(tr);
 
                     }
                 });
@@ -351,6 +378,8 @@
                         let new_total = total.minus(discount);
                         // $('#total').text(numberFormat.format(new_total));
                         // update span coupon_name and coppon_value 
+                        coupon_name_state = coupon;
+                        coupon_value_state = data.value;
                         $('#coupon_name').text(coupon);
                         $('#coupon_value').text(numberFormat.format(data.value));
                         $('#coupon_status_danger').hide();
@@ -359,6 +388,8 @@
                         $('#coupon').val('');
                         $('.coupon_value_paragraph').show();
                     } else {
+                        coupon_name_state = coupon;
+                        coupon_value_state = 0;
                         $('#coupon_name').text(coupon);
                         $('#coupon_value').text("Coupon not valid");
                         $('#coupon_status_danger').show();
@@ -402,8 +433,12 @@
                 }
             });
         });
-
-
+        $("#paid").on('click', async (e) => {
+            postReceipt(e);
+        })
+        $("#cash_paid").on('click', async (e) => {
+            postReceipt(e);
+        })
         // onchange of <b> id="amount" => cal new total using Decimal.js and update element have id=total it
         $(document).on('change', '#quantity', async function() {
             let quantity = parseInt($(this).val());
@@ -412,8 +447,6 @@
             $(this).closest('tr').find('td:last-child').html(`<h5><b class="amount">${amount.toFixed(2)}</b></h5>`);
             await updateTotal();
         });
-
-
         $(document).on('click', '.delete-button', async function() {
             $(this).closest('tr').remove();
             await updateTotal();
