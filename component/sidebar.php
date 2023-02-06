@@ -59,7 +59,7 @@
                      </a>
                  </li>
                  <li class="nav-item">
-                     <a href="./dashboard.php" class="nav-link <?= basename($_SERVER['REQUEST_URI']) == "history.php" ? "active" : "" ?>">
+                     <a href="./history.php" class="nav-link <?= basename($_SERVER['REQUEST_URI']) == "history.php" ? "active" : "" ?>">
                          <i class="nav-icon fas fa-history"></i>
                          <p>
                              History
@@ -77,7 +77,7 @@
                      </a>
                  </li>
                  <li class="nav-item">
-                     <a href="./dashboard.php" class="nav-link <?= basename($_SERVER['REQUEST_URI']) == "member.php" ? "active" : "" ?>">
+                     <a href="./member.php" class="nav-link <?= basename($_SERVER['REQUEST_URI']) == "member.php" ? "active" : "" ?>">
                          <i class="nav-icon fas fa-user-friends"></i>
                          <p>
                              Member

@@ -1,7 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<?php include "./component/head_with_auth.php" ?>
+<?php include "./component/head_with_auth.php";
+include "./db/condb.php";
+$sql = "SELECT * FROM product";
+$result = mysqli_query($condb, $sql);
+$products = [];
+if (mysqli_num_rows($result) > 0) {
+    // output data of each row
+    while ($row = mysqli_fetch_assoc($result)) {
+        // push data to $res
+        array_push($products, $row);
+    }
+    // echo var_dump($res);
+    // echo $res;
+    // echo json_encode($res);
+} else {
+    // echo "0 results";
+} ?>
 
 <head>
     <!-- DataTables -->
@@ -78,7 +94,29 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-
+                                        <!-- <tr>
+                                            <th>Rendering engine</th>
+                                            <th>Browser</th>
+                                            <th>Platform(s)</th>
+                                            <th>Engine version</th>
+                                            <th>CSS grade</th>
+                                        </tr> -->
+                                        <!-- create for each $products -->
+                                        <?php foreach ($products as $product) { ?>
+                                            <tr key="<?php echo $product['product_id'] ?>">
+                                                <td><?php echo $product['product_id'] ?></td>
+                                                <td><?php echo $product['name'] ?></td>
+                                                <td><?php echo $product['stock'] ?></td>
+                                                <td>
+                                                    <button onclick="product_id = $(this).parent().parent().attr('key');console.log(product_id);" class="btn btn-success" data-toggle="modal" data-target="#modal-add" data-product-id="<?php echo $product['product_id'] ?>" data-product-name="<?php echo $product['product_name'] ?>" data-stock="<?php echo $product['stock'] ?>">
+                                                        Add
+                                                    </button>
+                                                </td>
+                                                <td>
+                                                    <button onclick="product_id = $(this).parent().parent().attr('key');console.log(product_id);" class="btn btn-danger" data-toggle="modal" data-target="#modal-remove" data-product-id="<?php echo $product['product_id'] ?>" data-product-name="<?php echo $product['product_name'] ?>" data-stock="<?php echo $product['stock'] ?>">Remove</button>
+                                                </td>
+                                            </tr>
+                                        <?php } ?>
                                     </tbody>
                                     <!-- <tfoot>
                                         <tr>
@@ -89,6 +127,7 @@
                                             <th>CSS grade</th>
                                         </tr>
                                     </tfoot> -->
+
                                 </table>
                             </div>
                             <!-- /.card-body -->
@@ -184,11 +223,9 @@
                             <div class="d-flex justify-content-center">
                                 <!-- create img to preview image 200px*200px when user choosed file-->
                                 <img src="" style="display: none;" alt="" id="img_preview" width="200px" height="200px">
-
                             </div>
                             <!-- create img to preview image 200px*200px when user choosed file-->
                             <!-- <img src="" style="display: none;" alt="" id="img_preview" width="200px" height="200px"> -->
-
                         </div>
                         <div class="modal-footer justify-content-between">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -254,99 +291,20 @@
     <script>
         let product_id = 0;
         let quantity = 0;
-        // when document ready write jquery get array data from ./api/stock/get_stock.php
-        $("document").ready((e) => {
-            $.ajax({
-                url: "./api/stock/get_stock.php",
-                type: "GET",
-                success: (data) => {
-                    data = JSON.parse(data);
-                    console.log(data);
-                    // remove td that have class dataTables_empty
-                    $("td.dataTables_empty").remove();
-                    // for each data render element on html
-                    data.forEach((element) => {
-                        let tr = document.createElement("tr");
-                        let td1 = document.createElement("td");
-                        let td2 = document.createElement("td");
-                        let td3 = document.createElement("td");
-                        let td4 = document.createElement("td");
-                        let td5 = document.createElement("td");
-                        let span1 = document.createElement("span");
-                        let span2 = document.createElement("span");
-                        tr.setAttribute("key", element.product_id);
-                        td4.classList.add("text-center");
-                        td5.classList.add("text-center");
-                        td1.innerHTML = element.product_id;
-                        td2.innerHTML = element.name;
-                        td3.innerHTML = element.stock;
-                        td3.classList.add("text-center");
-                        span1.innerHTML = "add";
-                        span1.classList.add("btn");
-                        span1.classList.add("btn-success");
-                        span1.classList.add("outside-add");
-                        span1.setAttribute("data-toggle", "modal");
-                        span1.setAttribute("data-target", "#modal-add");
-                        span1.setAttribute("data-product_id", element.product_id);
-                        span1.setAttribute("data-product_name", element.product_name);
-                        span1.setAttribute("data-stock", element.stock);
-                        span2.innerHTML = "remove";
-                        span2.classList.add("btn");
-                        span2.classList.add("btn-warning");
-                        span2.classList.add("outside-remove");
-                        span2.setAttribute("data-toggle", "modal");
-                        span2.setAttribute("data-target", "#modal-remove");
-                        span2.setAttribute("data-product_id", element.product_id);
-                        span2.setAttribute("data-product_name", element.name);
-                        span2.setAttribute("data-stock", element.stock);
-                        td4.classList.add("text-center");
-                        // add onclick callback function to span1
-                        span1.onclick = (e) => {
-                            e.preventDefault();
-                            // get key value from attribute ket on parent td
-                            product_id = e.target.parentElement.parentElement.getAttribute("key");
-                        }
-                        span2.onclick = (e) => {
-                            e.preventDefault();
-                            // get key value from attribute ket on parent td
-                            product_id = e.target.parentElement.parentElement.getAttribute("key");
-                        }
-                        td4.appendChild(span1);
-                        td5.appendChild(span2);
-                        tr.appendChild(td1);
-                        tr.appendChild(td2);
-                        tr.appendChild(td3);
-                        tr.appendChild(td4);
-                        tr.appendChild(td5);
-                        document.querySelector("tbody").appendChild(tr);
-                    })
-                },
-                error: (err) => {
-                    console.log(err);
-                }
-            })
-        })
-
 
         $(function() {
+
             //Initialize Select2 Elements
             $('.select2').select2()
 
-            // $("#example1").DataTable({
-            //     "responsive": true,
-            //     "lengthChange": false,
-            //     "autoWidth": false,
-            //     "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-            // }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-            $('#example2').DataTable({
-                "paging": true,
-                "lengthChange": false,
-                "searching": false,
-                "ordering": true,
-                "info": true,
-                "autoWidth": false,
+            $("#example1").DataTable({
                 "responsive": true,
-            });
+                "lengthChange": false,
+                "autoWidth": false,
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+
+
 
             $("#add").click(async (e) => {
                 e.preventDefault();
@@ -514,7 +472,6 @@
                     }
                 })
             });
-
         });
     </script>
 </body>

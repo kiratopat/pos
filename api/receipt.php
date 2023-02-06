@@ -37,7 +37,9 @@ if ($_POST) {
     $member_tel = $_POST['member_tel'];
     $products = $_POST['product_list'];
     //echo var_dump($employee_id, $total, $coupon, $member_tel, $product);
-    // echo count($product);
+    // echo $products;
+    // echo var_dump($products);
+    // echo count($products);
 
 
     // check if member_tel is empty
@@ -56,7 +58,7 @@ if ($_POST) {
     }
 
     $sql = "UPDATE `coupon` SET `stock`= stock-1 WHERE coupon.name = '$coupon';";
-    $result = $condb->query($sql);
+    // $result = $condb->query($sql);
     // if have result return
     // if ($result->num_rows > 0) {
     //     $row = $result->fetch_assoc();
@@ -81,25 +83,28 @@ if ($_POST) {
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $receipt_id = $row['receipt_id'];
-            //echo "\nRCP_ID = " . $receipt_id;
-            // for item in $products array echo them
-            for ($i = 0; $i < count($products); $i++) {
-                //echo "\n" . $products[$i]['id'] . "\n";
-                //echo "\n" . $products[$i]['quantity'] . "\n";
-                //echo "\n" . $products[$i]['amount'] . "\n";
-                // $sql = "INSERT INTO `productreceipt`(`receipt_id`, `product_id`, `quantity`, `amount`) VALUES ($receipt_id,$products[$i]['id'],$products[$i]['quantity'],$products[$i]['amount'])"
-                $sql = "INSERT INTO productreceipt (receipt_id, product_id, quantity, amount) VALUES ($receipt_id, " . $products[$i]['id'] . ", " . $products[$i]['quantity'] . ", " . $products[$i]['amount'] . ")";
-                //echo "\n$sql\n";
-                $result = $condb->query($sql);
-                if ($condb->query($sql) === TRUE) {
 
-                    //echo "\n" . $products[$i]['name'] . "New record created successfully";
-                } else {
+            // for each item in $products array echo them
+            foreach ($products as $product) {
+                $product_id = $product['id'];
+                $product_quantity = $product['quantity'];
+                $sql = "UPDATE `product` SET `stock`=stock-$product_quantity WHERE `product`.`product_id`=$product_id;";
+                $result = $condb->query($sql);
+                if ($result !== TRUE) {
+                    echo http_response_code(501);
+                    echo "Can't insert product_receipt";
+                }
+                $sql = "INSERT INTO productreceipt (receipt_id, product_id, quantity, amount) VALUES ($receipt_id, " . $product['id'] . ", " . $product['quantity'] . ", " . $product['amount'] . ")";
+                $result = $condb->query($sql);
+                if ($result !== TRUE) {
                     echo http_response_code(501);
                     echo "Can't insert product_receipt";
                 }
             }
             echo http_response_code(200);
+            // echo $products;
+            // echo var_dump($products);
+            // echo count($products);
         } else {
             echo http_response_code(501);
             echo "something wrong when get max receipt id";
