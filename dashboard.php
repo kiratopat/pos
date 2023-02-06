@@ -1,3 +1,18 @@
+<?php
+include "./db/condb.php";
+$sql = "SELECT SUM(total) as y, CONCAT(`customer`.`fname`, ' ', `customer`.`lname`) AS name
+FROM Receipt
+INNER JOIN `customer` ON `receipt`.`customer_id`=`customer`.`customer_id`
+GROUP BY `receipt`.`customer_id`;
+";
+$result = $condb->query($sql);
+$rows = array();
+while ($row = $result->fetch_assoc()) {
+    $rows[] = $row;
+}
+mysqli_close($condb);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -35,29 +50,91 @@
 
 
         <script>
+            let receipt_data = JSON.parse(`<?= json_encode($rows) ?>`);
+            // for each data turn y to float data type
+            receipt_data.forEach((data) => {
+                data.y = parseFloat(data.y);
+            });
+
+            console.log(receipt_data);
+
+            // for each data turn to this format
+            // {
+            //     name: 'Chrome',
+            //     y: 70.67,
+            //     sliced: true,
+            //     selected: true
+            // }
+
             document.addEventListener('DOMContentLoaded', function() {
                 const chart = Highcharts.chart('container', {
                     chart: {
-                        type: 'bar'
+                        plotBackgroundColor: null,
+                        plotBorderWidth: null,
+                        plotShadow: false,
+                        type: 'pie'
                     },
                     title: {
-                        text: 'Fruit Consumption'
+                        text: 'Browser income shares from Receipt',
+                        align: 'left'
                     },
-                    xAxis: {
-                        categories: ['Apples', 'Bananas', 'Oranges']
+                    tooltip: {
+                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
                     },
-                    yAxis: {
-                        title: {
-                            text: 'Fruit eaten'
+                    accessibility: {
+                        point: {
+                            valueSuffix: '%'
+                        }
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: true,
+                                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                            }
                         }
                     },
                     series: [{
-                        name: 'Jane',
-                        data: [1, 0, 4]
-                    }, {
-                        name: 'John',
-                        data: [5, 7, 3]
+                        name: 'Customer income share',
+                        colorByPoint: true,
+                        data: receipt_data
                     }]
+                    // [{
+                    //     name: 'Customer income share',
+                    //     colorByPoint: true,
+                    //     data: [{
+                    //         name: 'Chrome',
+                    //         y: 70.67,
+                    //         sliced: true,
+                    //         selected: true
+                    //     }, {
+                    //         name: 'Edge',
+                    //         y: 14.77
+                    //     }, {
+                    //         name: 'Firefox',
+                    //         y: 4.86
+                    //     }, {
+                    //         name: 'Safari',
+                    //         y: 2.63
+                    //     }, {
+                    //         name: 'Internet Explorer',
+                    //         y: 1.53
+                    //     }, {
+                    //         name: 'Opera',
+                    //         y: 1.40
+                    //     }, {
+                    //         name: 'Sogou Explorer',
+                    //         y: 0.84
+                    //     }, {
+                    //         name: 'QQ',
+                    //         y: 0.51
+                    //     }, {
+                    //         name: 'Other',
+                    //         y: 2.6
+                    //     }]
+                    // }]
                 });
             });
         </script>
